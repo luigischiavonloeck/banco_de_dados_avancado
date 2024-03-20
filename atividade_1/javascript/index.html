@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <script
+      src="https://code.jquery.com/jquery-3.7.1.js"
+      integrity="sha256-eKhayi8LEQwp4NKxN+CfCh+3qOVUtJn3QNZ0TciWLP4="
+      crossorigin="anonymous"
+    ></script>
+    <title>Acesso ao firebase</title>
+  </head>
+  <body>
+    <script>
+      $(document).ready(function () {
+        function firebaseHandler(data, type = 'GET', id) {
+          // var url =
+          //   'https://firstproject-24838-default-rtdb.firebaseio.com/users/'
+          // if (id) {
+          //   url += id + '.json'
+          // } else {
+          //   url += '.json'
+          // }
+          $.ajax({
+            url: 'https://firstproject-24838-default-rtdb.firebaseio.com/users.json',
+            type: type,
+            data: JSON.stringify(data),
+            success: function () {
+              console.log('success')
+            },
+            error: function (error) {
+              console.log('error: ' + error)
+            }
+          })
+        }
+
+        var params = [
+          { name: 'Maria', email: 'maria@gmail.com', idade: 15 },
+          { name: 'Joao', email: 'joao@gmail.com', idade: 25 },
+          { name: 'ana', email: 'ana@gmail.com', idade: 23 }
+        ]
+
+        params.forEach(param => {
+          firebaseHandler(param, 'POST')
+        })
+
+        firebaseHandler({ name: 'Maria Silva' }, 'PATCH')
+
+        firebaseHandler({ name: 'Joao Gomes', idade: 35 }, 'PATCH')
+
+        // success: function (response) {
+        //     // Atualizando e enviando os usuários de volta ao Firebase
+        //     for (var userId in response) {
+        //         var user = response[userId];
+        //         if (user.name === 'Maria') {
+        //             // Adicionando sobrenome à Maria
+        //             user.name += ' Silva';
+        //             firebaseHandler(user, 'PUT', userId);
+        //         } else if (user.name === 'Joao') {
+        //             // Alterando idade e adicionando sobrenome ao nome do João
+        //             user.name = 'Joao Silva';
+        //             user.idade = 30;
+        //             firebaseHandler(user, 'PUT', userId);
+        //         }
+        //     }
+      })
+    </script>
+  </body>
+</html>
