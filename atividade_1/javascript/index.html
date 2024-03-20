@@ -13,57 +13,48 @@
   <body>
     <script>
       $(document).ready(function () {
-        function firebaseHandler(data, type = 'GET', id) {
-          // var url =
-          //   'https://firstproject-24838-default-rtdb.firebaseio.com/users/'
-          // if (id) {
-          //   url += id + '.json'
-          // } else {
-          //   url += '.json'
-          // }
+        function firebaseHandler(data, type = "GET", id) {
+          var url =
+            "https://firstproject-24838-default-rtdb.firebaseio.com/users";
+
+          url += id ? "/" + id : "";
+          url += ".json";
+
+          console.log(url);
+
           $.ajax({
-            url: 'https://firstproject-24838-default-rtdb.firebaseio.com/users.json',
+            url: url,
             type: type,
             data: JSON.stringify(data),
             success: function () {
-              console.log('success')
+              console.log("success" + data);
             },
             error: function (error) {
-              console.log('error: ' + error)
-            }
-          })
+              console.log("error: " + error);
+            },
+          });
         }
 
         var params = [
-          { name: 'Maria', email: 'maria@gmail.com', idade: 15 },
-          { name: 'Joao', email: 'joao@gmail.com', idade: 25 },
-          { name: 'ana', email: 'ana@gmail.com', idade: 23 }
-        ]
+          { id: 1, name: "Maria", email: "maria@gmail.com", idade: 15 },
+          { id: 2, name: "Joao", email: "joao@gmail.com", idade: 25 },
+          { id: 3, name: "ana", email: "ana@gmail.com", idade: 23 },
+        ];
 
-        params.forEach(param => {
-          firebaseHandler(param, 'POST')
-        })
+        // firebaseHandler({ a: "a" }, "POST");
+        // firebaseHandler({ B: "B" }, "POST", 3);
+        alert("Inserção");
 
-        firebaseHandler({ name: 'Maria Silva' }, 'PATCH')
+        params.forEach((param) => {
+          firebaseHandler(param, "PUT", param.id);
+        });
 
-        firebaseHandler({ name: 'Joao Gomes', idade: 35 }, 'PATCH')
+        alert("Update");
 
-        // success: function (response) {
-        //     // Atualizando e enviando os usuários de volta ao Firebase
-        //     for (var userId in response) {
-        //         var user = response[userId];
-        //         if (user.name === 'Maria') {
-        //             // Adicionando sobrenome à Maria
-        //             user.name += ' Silva';
-        //             firebaseHandler(user, 'PUT', userId);
-        //         } else if (user.name === 'Joao') {
-        //             // Alterando idade e adicionando sobrenome ao nome do João
-        //             user.name = 'Joao Silva';
-        //             user.idade = 30;
-        //             firebaseHandler(user, 'PUT', userId);
-        //         }
-        //     }
-      })
+        firebaseHandler({ name: "Maria Silva" }, "PATCH", 1);
+
+        firebaseHandler({ name: "Joao Gomes", idade: 35 }, "PATCH", 2);
+      });
     </script>
   </body>
 </html>
