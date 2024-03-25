@@ -1,9 +1,11 @@
 exemplos/exemploPhpApi/vendor
 exemplos/exemploNode/node_modules
 atividade_1/nodejs/node_modules
+atividade_2/node_modules
 
 # Arquivos de chaves de API
 exemplos/exemploPhpCurl/firebase_credentials.json
 exemplos/exemploPhpApi/firebase_credentials.json
 exemplos/exemploNode/firebase_credentials.js
 atividade_1/nodejs/firebase_credentials.js
+atividade_2/config/configDB.json
