@@ -12,8 +12,8 @@ use Google\Cloud\Firestore\Filter;
     try {
         $db = new FirestoreClient($configParams);
         $collecRef = $db->collection('Provedores');
-        //$datamaxima = $docs->rows()[0]['mensuracao'];
-        $docs = $collecRef->limit(1000)->documents();
+        
+        $docs = $collecRef->orderBy('cnpj')->limit(500)->documents(); // ordenado por cnpj para que o grafico contenha multiplos anos, não apenas 2023
 
         $totalYear = []; 
 
@@ -28,8 +28,13 @@ use Google\Cloud\Firestore\Filter;
         }
 
         foreach ($totalYear as $year => $total) {
-            $dataGraph[] = [$year,$total];
+            $dataGraph[] = [strval($year),$total];
         }
+
+        // ordena o array por ano
+        usort($dataGraph, function($a, $b) {
+          return $a[0] <=> $b[0];
+      });
 
     } catch (Exception $e) {
         echo "Erro: " . $e->getMessage();
@@ -65,6 +70,6 @@ use Google\Cloud\Firestore\Filter;
         </script>
       </head>
       <body>
-      <div id="chart_div" style="width: 100%; height: 500px;"></div>
+      <div id="chart_div" style="width: 100%; height: 700px;"></div>
     </body>
     </html>

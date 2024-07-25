@@ -13,7 +13,7 @@ if (isset($_POST['submit'])) {
     try {
         $db = new FirestoreClient($configParams);
         $collecRef = $db->collection('Provedores');
-        $docs = $collecRef->where('mensuracao', '==', $selectedDate)->limit(10)->documents();
+        $docs = $collecRef->where('mensuracao', '==', $selectedDate)->limit(50)->documents();
         echo "<table border='1' cellpadding='10'>";
         echo "<tr><th>Empresa</th><th>Grupo</th><th>Tecnologia</th><th>Quantidade</th><th>Velocidade</th></tr>";
         foreach ($docs as $doc) {
