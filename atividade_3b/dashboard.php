@@ -10,7 +10,7 @@ $configParams = [
 try {
     $db = new FirestoreClient($configParams);
     $collecRef = $db->collection('Provedores');
-    $docs = $collecRef->orderBy('mensuracao', 'ASC')->limit(100)->documents();
+    $docs = $collecRef->orderBy('mensuracao', 'ASC')->limit(1000)->documents();
 
     $dataGraph = [];
     $totalYear = [];
@@ -60,6 +60,62 @@ try {
           margin: 0;
           padding: 0;
         }
+        body {
+            height: 100vh;
+            width: 100vw;
+            overflow: hidden;
+        }
+        .dashboard {
+            display: flex;
+            flex-direction: row;
+            width: 100vw;
+            height: 100%;
+            flex: 1;
+        }
+        .graph1 {
+            display: flex;
+            flex-direction: column;
+            flex: 5;
+            max-width: 65vw;
+            border-right: 1px solid black;
+        }
+        .graph2 {
+            display: flex;
+            flex-direction: column;
+            flex: 3;
+            max-width: 35vw;
+            border-left: 1px solid black;
+        }
+        #techCheckboxes {
+            display: flex;
+            background-color: #59c;
+            flex-direction: row;
+            flex-wrap: wrap;
+            min-height: fit-content;
+            justify-content: space-between;
+            align-items: center;
+            padding: 30px 50px;
+        }
+        .techBox {
+            width: fit-content;
+            margin: 10px 20px;
+        }
+        .techInput + label {
+            background-color: #666;
+            padding: 5px 10px;
+            color: #fff;
+            border-radius: 5px;
+            font-size: 26px;
+            font-family: Arial, sans-serif;
+            user-select: none;
+        }
+        .techInput + label:hover {
+            background-color: #88c;
+        }
+        .techInput:checked + label {
+            background-color: #ddd;
+            color: black;
+        }
         .header {
           text-align: center;
           font-family: Arial, sans-serif;
@@ -69,40 +125,72 @@ try {
         }
         #chart_div {
             width: 100%;
-            height: 500px;
+            height: 700px;
         }
-        .form-container {
-            margin-bottom: 20px;
+        #piechart_div {
+            width: 100%;
+            height: 700px;
         }
+        .selectYear {
+            height: 100px;
+            display: flex;
+            background-color: #999;
+            flex-direction: row;
+            justify-content: space-between;
+            align-items: center;
+            padding: 30px;
+        }
+        #yearSelector {    
+	        appearance: none;
+	        width: 100%;
+	        font-size: 22px;
+	        padding: 5px 10px;
+	        background-color: #FFFFFF;
+	        border: 1px solid #555;
+	        border-radius: 5px;
+	        color: #000000;
+	        cursor: pointer;
+        }
+        
     </style>
 </head>
 <body>
     <h1 class="header">Dashboard de Assinantes de Internet em Pelotas</h1>
-    <div class="form-container">
-        <label>Selecione as Tecnologias:</label>
-        <div id="techCheckboxes">
-            <?php foreach (json_decode($allTechsjson) as $tech): ?>
-                <div>
-                    <input type="checkbox" id="tech_<?php echo $tech; ?>" value="<?php echo $tech; ?>" onchange="drawPieChart()">
-                    <label for="tech_<?php echo $tech; ?>"><?php echo $tech; ?></label>
-                </div>
-            <?php endforeach; ?>
+    <div class="dashboard">
+        <div class="graph1">
+            <div id="techCheckboxes">
+                <?php foreach (json_decode($allTechsjson) as $tech): ?>
+                    <div class="techBox">
+                        <input type="checkbox" class="techInput" style="display: none" id="tech_<?php echo $tech; ?>" value="<?php echo $tech; ?>" onchange="drawPieChart()">
+                        <label for="tech_<?php echo $tech; ?>"><?php echo $tech; ?></label>
+                    </div>
+                <?php endforeach; ?>
+            </div>
+            <div id="chart_div"></div>
+        </div>
+        <div class="graph2">
+            <div class="selectYear">
+                <select id="yearSelector">
+                    <?php
+                    $years = array_unique(array_column(json_decode($dataGraphjson, true), 0));
+                    foreach ($years as $year) {
+                        echo "<option value=\"$year\">$year</option>";
+                    }
+                    ?>
+                </select>
+            </div>
+            <div id="piechart_div"></div>
         </div>
     </div>
-    <div id="chart_div"></div>
-    <select id="yearSelector">
-        <?php
-        $years = array_unique(array_column(json_decode($dataGraphjson, true), 0));
-        foreach ($years as $year) {
-            echo "<option value=\"$year\">$year</option>";
-        }
-        ?>
-    </select>
-    <div id="piechart_div"></div>
+    
+    
 
     <script type="text/javascript">
         google.charts.load('current', {'packages':['corechart']});
-        google.charts.setOnLoadCallback(drawChart);
+        google.charts.setOnLoadCallback(()=>{
+            drawChart()
+            drawPieChart()
+        });
 
         var allTechs = <?php echo $allTechsjson; ?>; // Definindo allTechs no escopo global
 
@@ -132,7 +220,7 @@ try {
                 title: 'Número de Assinantes por Ano e Tecnologia',
                 hAxis: {title: 'Ano', titleTextStyle: {color: '#333'}},
                 vAxis: {minValue: 0},
-                chartArea: {width: '70%', height: '70%'},
+                chartArea: {width: '65vw', height: '70%'},
                 isStacked: false
             };
 
@@ -165,7 +253,7 @@ try {
 
             var options = {
                 title: 'Distribuição de Assinantes por Tecnologia',
-                chartArea: {width: '70%', height: '70%'}
+                chartArea: {width: '35vw', height: '70%'}
             };
 
             var chart = new google.visualization.PieChart(document.getElementById('piechart_div'));
