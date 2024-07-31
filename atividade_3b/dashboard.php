@@ -83,13 +83,22 @@ try {
         <div id="techCheckboxes">
             <?php foreach (json_decode($allTechsjson) as $tech): ?>
                 <div>
-                    <input type="checkbox" id="tech_<?php echo $tech; ?>" value="<?php echo $tech; ?>" onchange="updateChart()">
+                    <input type="checkbox" id="tech_<?php echo $tech; ?>" value="<?php echo $tech; ?>" onchange="drawPieChart()">
                     <label for="tech_<?php echo $tech; ?>"><?php echo $tech; ?></label>
                 </div>
             <?php endforeach; ?>
         </div>
     </div>
     <div id="chart_div"></div>
+    <select id="yearSelector">
+        <?php
+        $years = array_unique(array_column(json_decode($dataGraphjson, true), 0));
+        foreach ($years as $year) {
+            echo "<option value=\"$year\">$year</option>";
+        }
+        ?>
+    </select>
+    <div id="piechart_div"></div>
 
     <script type="text/javascript">
         google.charts.load('current', {'packages':['corechart']});
@@ -98,37 +107,19 @@ try {
         var allTechs = <?php echo $allTechsjson; ?>; // Definindo allTechs no escopo global
 
         function drawChart() {
-            var data = new google.visualization.DataTable();
-            data.addColumn('string', 'Ano');
-            allTechs.forEach(function(tech) {
-                data.addColumn('number', tech);
-            });
-            data.addRows(<?php echo $dataGraphjson; ?>);
-
-            var options = {
-                title: 'Número de Assinantes por Ano e Tecnologia',
-                hAxis: {title: 'Ano', titleTextStyle: {color: '#333'}},
-                vAxis: {minValue: 0},
-                chartArea: {width: '70%', height: '70%'},
-                isStacked: false
-            };
-
-            var chart = new google.visualization.LineChart(document.getElementById('chart_div'));
-            chart.draw(data, options);
-        }
-
-        function updateChart() {
             var selectedTechs = Array.from(document.querySelectorAll('#techCheckboxes input:checked')).map(checkbox => checkbox.value);
+            var techsToUse = selectedTechs.length > 0 ? selectedTechs : allTechs;
+
             var data = new google.visualization.DataTable();
             data.addColumn('string', 'Ano');
-            selectedTechs.forEach(function(tech) {
+            techsToUse.forEach(function(tech) {
                 data.addColumn('number', tech);
             });
-
+            
             var allData = <?php echo $dataGraphjson; ?>;
             var filteredData = allData.map(row => {
                 var newRow = [row[0]];
-                selectedTechs.forEach(function(tech) {
+                techsToUse.forEach(function(tech) {
                     var index = allTechs.indexOf(tech) + 1;
                     newRow.push(row[index]);
                 });
@@ -148,6 +139,46 @@ try {
             var chart = new google.visualization.LineChart(document.getElementById('chart_div'));
             chart.draw(data, options);
         }
+
+        function drawPieChart() {
+            var selectedTechs = Array.from(document.querySelectorAll('#techCheckboxes input:checked')).map(checkbox => checkbox.value);
+            var techsToUse = selectedTechs.length > 0 ? selectedTechs : allTechs;
+            var selectedYear = document.getElementById('yearSelector').value;
+
+            var data = new google.visualization.DataTable();
+            data.addColumn('string', 'Tecnologia');
+            data.addColumn('number', 'Assinantes');
+            
+            var allData = <?php echo $dataGraphjson; ?>;
+            var techSums = techsToUse.map(function(tech) {
+                var sum = 0;
+                allData.forEach(function(row) {
+                    if (row[0] == selectedYear) {
+                        var index = allTechs.indexOf(tech) + 1;
+                        sum += row[index];
+                    }
+                });
+                return [tech, sum];
+            });
+
+            data.addRows(techSums);
+
+            var options = {
+                title: 'Distribuição de Assinantes por Tecnologia',
+                chartArea: {width: '70%', height: '70%'}
+            };
+
+            var chart = new google.visualization.PieChart(document.getElementById('piechart_div'));
+            chart.draw(data, options);
+        }
+
+        document.querySelectorAll('#techCheckboxes input').forEach(function(checkbox) {
+        checkbox.addEventListener('change', function() {
+            drawChart();
+            drawPieChart();
+        });
+        });
+        document.getElementById('yearSelector').addEventListener('change', drawPieChart);
     </script>
 </body>
 </html>
