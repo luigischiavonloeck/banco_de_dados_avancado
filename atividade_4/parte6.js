@@ -1,6 +1,5 @@
 use('Empregos')
 
-//Quantas regiões tinham > de 100 empregos em ti no RS em 2021?
 db.empregos.aggregate([
   {
     $match: {

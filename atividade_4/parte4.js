@@ -1,7 +1,5 @@
 use('Empregos')
 
-//Qual região tinha mais empregos em 2021?
-
 db.empregos.aggregate([
   {
     $match: {

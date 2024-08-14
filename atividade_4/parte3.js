@@ -1,6 +1,5 @@
 use('Empregos')
 
-//Qual salário médio em Pelotas (Lembre-se que se uma área tem 100 empregados e outra 1 o salário de uma é 100x mais representativo que da outra) ?
 db.empregos.aggregate([
   {
     $match: {
