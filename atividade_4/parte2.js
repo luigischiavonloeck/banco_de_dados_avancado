@@ -1,15 +1,15 @@
-use('Empregos')
+use("Empregos");
 
 db.empregos.aggregate([
   {
     $match: {
-      ano: 2021
-    }
+      ano: 2021,
+    },
   },
   {
     $group: {
       _id: null,
-      total: { $sum: '$salariomedio' }
-    }
-  }
-])
+      total: { $sum: "$salariomedio" },
+    },
+  },
+]);
